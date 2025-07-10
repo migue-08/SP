@@ -1,0 +1,268 @@
+---
+title: "Punto 5 - Programación en R"
+subtitle: "Solución"
+author: "Miguel Martinez"
+date: today
+format: 
+  html:
+    toc: true
+    theme: cosmo
+editor: visual
+execute:
+  warning: false
+bibliography: references.bib
+---
+
+De no contar con el programa en su computador, descargue por favor de internet R y R Studio. A continuación, encontrará los links para efectuar la descarga;
+
+-   R Studio
+
+<https://rstudio.com/products/rstudio/download/#download>
+
+-   R
+
+<https://cran.r-project.org/bin/windows/base/>
+
+Desde la terminal de R Studio, realizar el siguiente ejercicio:
+
+1.  Importe la base de datos “Base.xlsx”. Pista: Para importar información desde Excel, descargue el complemento *openxlsx,* cárguelo con el comando *library()* e importe el documento con la función *read.xlsx().* Llame a esta base de datos **data**.
+2.  Cree una nueva columna llamada nommiles que equivalga a la columna Nominal divida por 1000.
+3.  Cree un dataframe llamado **dataprom,** que calcule el promedio del Nominal por Portafolio.
+4.  Cree un dataframe llamado **datatot,** que calcule la suma del VPN Local por Asset Class y por Portafolio.
+5.  Cree un dataframe llamado **data2**, partiendo de la base **data**, que muestre la toda la información únicamente para el portafolio OBLIGATORI.
+
+**Solución:**
+
+Para generar el presente documento se utilizaron herramientas estadísticas del `Tidyverse` de @wickham2023r. Por lo tanto, antes que nada debemos cargar las siguientes librerías:
+
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+## Punto 1
+
+Cargamos la base de datos:
+
+```{r}
+
+data <- read_excel("Base.xlsx")  
+
+data
+```
+
+## Punto 2
+
+Generamos una columna que consiste en el $\frac{Nominal}{1000}$:
+
+```{r}
+data <- data |>
+    mutate(nommiles = Nominal/1000)
+
+data
+```
+
+## Punto 3
+
+Promedio del nominal por portafolio:
+
+```{r}
+dataprom <- data  |> 
+  select(Portafolio, Nominal)  |> 
+  na.omit() |> 
+  group_by(Portafolio) |> 
+  summarise(Average_Nominal = mean(Nominal)) |> 
+  arrange(desc(Average_Nominal))
+
+dataprom
+```
+
+Promedio del nominal (en miles) por portafolio:
+
+```{r}
+dataprom2 <- data |> 
+  select(Portafolio, nommiles) |> 
+  na.omit() |> 
+  group_by(Portafolio) |> 
+  summarise(Average_nommiles = mean(nommiles)) |> 
+  arrange(desc(Average_nommiles))
+
+dataprom2
+```
+
+Adicional, se construyó un gráfico de barras que muestra los principales portafolios, que generan los mayores valores promedio del `nominal` (en miles de millones de pesos):
+
+```{r}
+#| echo: false
+
+dataprom |> 
+  head() |> 
+  mutate(Average_Nominal = Average_Nominal/1000000000) |> 
+  ggplot(aes(x = Portafolio, y = Average_Nominal)) +
+  geom_col(alpha = 0.9) +
+  labs(title = "Portafolios con mayores valores promedio del nominal",
+       subtitle = "(en miles de millones de pesos)") +
+  theme_bw()
+
+```
+
+## Punto 4
+
+Suma del VPNLocal por asset class y por portafolio:
+
+```{r}
+ 
+datatot <- data |> 
+  select(Portafolio, ASSETCLASS, VPNLocal) |> 
+  na.omit() |> 
+  group_by(ASSETCLASS, Portafolio) |> 
+  summarise(Sum_VPNLocal = sum(VPNLocal)) |> 
+  arrange(desc(Sum_VPNLocal))
+
+datatot
+```
+
+Adicional, se construyó un gráfico de barras que muestra los principales activos y portafolios que generan más `VPNLocal` (en billones de pesos):
+
+```{r}
+#| echo: false
+
+datatot |> 
+  head(10) |> 
+  mutate(Sum_VPNLocal = Sum_VPNLocal/1000000000000) |> 
+  ggplot(aes(x = Sum_VPNLocal, y = ASSETCLASS, fill = Portafolio)) +
+  geom_col(alpha = 0.9) +
+  labs(title = "Clases de activos y portafolios con mayor VPNLocal",
+       subtitle = "(en billones de pesos)") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+```
+
+## Extra
+
+Adicional, se pueden observar en el siguiente gráfico los principales activos y portafolios que generan más `VPNOrigen` (en billones de pesos).
+
+```{r}
+
+datatot2 <- data |> 
+  select(Portafolio, ASSETCLASS, VPNOrigen) |> 
+  na.omit() |> 
+  group_by(ASSETCLASS, Portafolio) |> 
+  summarise(Sum_VPNOrigen = sum(VPNOrigen)) |> 
+  arrange(desc(Sum_VPNOrigen))
+
+datatot2
+```
+
+```{r}
+#| echo: false
+
+datatot2 |> 
+  head(10) |> 
+  mutate(Sum_VPNOrigen = Sum_VPNOrigen/1000000000000) |> 
+  ggplot(aes(x = Sum_VPNOrigen, y = ASSETCLASS, fill = Portafolio)) +
+  geom_col(alpha = 0.9) +
+  labs(title = "Clases de activos y portafolios con mayor VPNOrigen",
+       subtitle = "(en billones de pesos)") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+```
+
+## Punto 5
+
+Base de datos filtrada para el portafolio OBLIGATORI:
+
+```{r}
+
+data2 <- data |> 
+  filter(Portafolio == "OBLIGATORI")
+
+data2
+```
+
+## Estadísticas descriptivas
+
+A continuación, se presentan algunas de las principales estadísticas descriptivas de la base de datos:
+
+```{r}
+#| echo: false
+
+data |> 
+  count(Portafolio, sort = TRUE) |> 
+  mutate(freq = n / sum(n)) |> 
+  head() |> 
+  ggplot(aes(x = freq, y = Portafolio)) +
+  geom_col(alpha = 0.9) +
+  labs(title = "Frecuencia relativa del número de Portafolios de la muestra", 
+       subtitle = "(%)") +
+  theme_bw()
+
+```
+
+```{r}
+#| echo: false
+
+data |> 
+  count(ASSETCLASS, sort = TRUE) |>
+  mutate(freq = n / sum(n)) |> 
+  head() |> 
+  ggplot(aes(x = freq, y = ASSETCLASS)) +
+  geom_col(alpha = 0.9) +
+  labs(title = "Frecuencia relativa del número de ASSETCLASS de la muestra",
+       subtitle = "(%)") +
+  theme_bw()
+
+```
+
+```{r}
+#| echo: false
+
+data |> 
+  count(Titulo, sort = TRUE) |> 
+  mutate(freq = n / sum(n)) |> 
+  head() |> 
+  ggplot(aes(x = freq, y = Titulo)) +
+  geom_col(alpha = 0.9) +
+  labs(title = "Frecuencia relativa del número de Títulos de la muestra", 
+       subtitle = "(%)") +
+  theme_bw()
+
+```
+
+¿Cuáles son las clases de activos (ASSETCLASS) con la mayor diversidad de Portafolios?
+
+```{r}
+
+df_AC <- data |> 
+  group_by(ASSETCLASS) |> 
+  summarise(Port_distinct = n_distinct(Portafolio)) |> 
+  arrange(desc(Port_distinct))
+
+df_AC
+```
+
+```{r}
+#| echo: false
+
+df_AC |> 
+  ggplot(aes(x = Port_distinct, y = ASSETCLASS)) +
+  geom_col(alpha = 0.9) +
+  labs(title = "ASSETCLASS con mayores portafolios") +
+  theme_bw()
+
+```
+
+¿Cuál es la relación que existe entre el valor del VPN Origen y el valor del VPN Local?
+
+```{r}
+#| echo: false
+
+data |> 
+  mutate(VPNOrigen = VPNOrigen/1000000000000, VPNLocal = VPNLocal/1000000000000) |>   ggplot(aes(x = VPNOrigen, y = VPNLocal)) +
+  geom_point(alpha = 0.3) +
+  labs(title = "Relación entre el valor del VPNOrigen y VPNLocal",
+       subtitle = "(en billones de pesos)") +
+  theme_bw()
+```
