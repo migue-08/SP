@@ -1,1 +1,2 @@
+## Statistical exercise
 In this repository you will find the documents required to reproduce this [statistical exercise](https://migue-08.github.io/SP/).
