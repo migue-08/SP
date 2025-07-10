@@ -1,0 +1,58 @@
+[
+  {
+    "objectID": "Punto_5_vf.html",
+    "href": "Punto_5_vf.html",
+    "title": "Punto 5 - Programación en R",
+    "section": "",
+    "text": "De no contar con el programa en su computador, descargue por favor de internet R y R Studio. A continuación, encontrará los links para efectuar la descarga;\nhttps://rstudio.com/products/rstudio/download/#download\nhttps://cran.r-project.org/bin/windows/base/\nDesde la terminal de R Studio, realizar el siguiente ejercicio:\nSolución:\nPara generar el presente documento se utilizaron herramientas estadísticas del Tidyverse de Wickham, Çetinkaya-Rundel, and Grolemund (2023). Por lo tanto, antes que nada debemos cargar las siguientes librerías:\nlibrary(readxl)\nlibrary(tidyverse)"
+  },
+  {
+    "objectID": "Punto_5_vf.html#punto-1",
+    "href": "Punto_5_vf.html#punto-1",
+    "title": "Punto 5 - Programación en R",
+    "section": "Punto 1",
+    "text": "Punto 1\nCargamos la base de datos:\n\ndata &lt;- read_excel(\"Base.xlsx\")  \n\ndata\n\n# A tibble: 6,404 × 8\n   Fecha               Portafolio ASSETCLASS     Numtit Titulo Nominal VPNOrigen\n   &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;\n 1 2019-02-28 00:00:00 ADMINISTRA LIQUIDEZ        37931 FONDO… 9.20e 4   3.39e 9\n 2 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38170 EPMM1… 1.5 e10   1.52e10\n 3 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38312 EPM_0… 1   e10   1.00e10\n 4 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38313 EPM_0… 1   e10   1.00e10\n 5 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38315 EPMM1… 5   e 9   5.07e 9\n 6 2019-02-28 00:00:00 ADMINISTRA BONOS FIJOS     38683 BDAV2… 9   e 9   9.50e 9\n 7 2019-02-28 00:00:00 ADMINISTRA BONOS TASA IN…  38718 CDTIB… 5   e 9   5.03e 9\n 8 2019-02-28 00:00:00 ADMINISTRA BONOS FIJOS     38776 BDAV2… 1   e 9   1.06e 9\n 9 2019-02-28 00:00:00 ADMINISTRA LIQUIDEZ        39018 FONDO… 1.51e 5   1.54e 9\n10 2019-02-28 00:00:00 ADMINISTRA BONOS TASA IN…  39151 CDTIB… 1.5 e10   1.50e10\n# ℹ 6,394 more rows\n# ℹ 1 more variable: VPNLocal &lt;dbl&gt;"
+  },
+  {
+    "objectID": "Punto_5_vf.html#punto-2",
+    "href": "Punto_5_vf.html#punto-2",
+    "title": "Punto 5 - Programación en R",
+    "section": "Punto 2",
+    "text": "Punto 2\nGeneramos una columna que consiste en el \\(\\frac{Nominal}{1000}\\):\n\ndata &lt;- data |&gt;\n    mutate(nommiles = Nominal/1000)\n\ndata\n\n# A tibble: 6,404 × 9\n   Fecha               Portafolio ASSETCLASS     Numtit Titulo Nominal VPNOrigen\n   &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;\n 1 2019-02-28 00:00:00 ADMINISTRA LIQUIDEZ        37931 FONDO… 9.20e 4   3.39e 9\n 2 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38170 EPMM1… 1.5 e10   1.52e10\n 3 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38312 EPM_0… 1   e10   1.00e10\n 4 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38313 EPM_0… 1   e10   1.00e10\n 5 2019-02-28 00:00:00 ADMINISTRA D PUB FIJA      38315 EPMM1… 5   e 9   5.07e 9\n 6 2019-02-28 00:00:00 ADMINISTRA BONOS FIJOS     38683 BDAV2… 9   e 9   9.50e 9\n 7 2019-02-28 00:00:00 ADMINISTRA BONOS TASA IN…  38718 CDTIB… 5   e 9   5.03e 9\n 8 2019-02-28 00:00:00 ADMINISTRA BONOS FIJOS     38776 BDAV2… 1   e 9   1.06e 9\n 9 2019-02-28 00:00:00 ADMINISTRA LIQUIDEZ        39018 FONDO… 1.51e 5   1.54e 9\n10 2019-02-28 00:00:00 ADMINISTRA BONOS TASA IN…  39151 CDTIB… 1.5 e10   1.50e10\n# ℹ 6,394 more rows\n# ℹ 2 more variables: VPNLocal &lt;dbl&gt;, nommiles &lt;dbl&gt;"
+  },
+  {
+    "objectID": "Punto_5_vf.html#punto-3",
+    "href": "Punto_5_vf.html#punto-3",
+    "title": "Punto 5 - Programación en R",
+    "section": "Punto 3",
+    "text": "Punto 3\nPromedio del nominal por portafolio:\n\ndataprom &lt;- data  |&gt; \n  select(Portafolio, Nominal)  |&gt; \n  na.omit() |&gt; \n  group_by(Portafolio) |&gt; \n  summarise(Average_Nominal = mean(Nominal)) |&gt; \n  arrange(desc(Average_Nominal))\n\ndataprom\n\n# A tibble: 71 × 2\n   Portafolio Average_Nominal\n   &lt;chr&gt;                &lt;dbl&gt;\n 1 VOLUNTARIO    15156062398.\n 2 OBLIGATORI    14252198068.\n 3 158           12815193282.\n 4 OBLICONSER    10540517386.\n 5 164           10338634124.\n 6 FONPET2012     9145578185.\n 7 ADMINISTRA     8131667241.\n 8 103            7821264561.\n 9 113            6626700499.\n10 CESANTIACP     6531178147.\n# ℹ 61 more rows\n\n\nPromedio del nominal (en miles) por portafolio:\n\ndataprom2 &lt;- data |&gt; \n  select(Portafolio, nommiles) |&gt; \n  na.omit() |&gt; \n  group_by(Portafolio) |&gt; \n  summarise(Average_nommiles = mean(nommiles)) |&gt; \n  arrange(desc(Average_nommiles))\n\ndataprom2\n\n# A tibble: 71 × 2\n   Portafolio Average_nommiles\n   &lt;chr&gt;                 &lt;dbl&gt;\n 1 VOLUNTARIO        15156062.\n 2 OBLIGATORI        14252198.\n 3 158               12815193.\n 4 OBLICONSER        10540517.\n 5 164               10338634.\n 6 FONPET2012         9145578.\n 7 ADMINISTRA         8131667.\n 8 103                7821265.\n 9 113                6626700.\n10 CESANTIACP         6531178.\n# ℹ 61 more rows\n\n\nAdicional, se construyó un gráfico de barras que muestra los principales portafolios, que generan los mayores valores promedio del nominal (en miles de millones de pesos):"
+  },
+  {
+    "objectID": "Punto_5_vf.html#punto-4",
+    "href": "Punto_5_vf.html#punto-4",
+    "title": "Punto 5 - Programación en R",
+    "section": "Punto 4",
+    "text": "Punto 4\nSuma del VPNLocal por asset class y por portafolio:\n\ndatatot &lt;- data |&gt; \n  select(Portafolio, ASSETCLASS, VPNLocal) |&gt; \n  na.omit() |&gt; \n  group_by(ASSETCLASS, Portafolio) |&gt; \n  summarise(Sum_VPNLocal = sum(VPNLocal)) |&gt; \n  arrange(desc(Sum_VPNLocal))\n\ndatatot\n\n# A tibble: 324 × 3\n# Groups:   ASSETCLASS [14]\n   ASSETCLASS        Portafolio Sum_VPNLocal\n   &lt;chr&gt;             &lt;chr&gt;             &lt;dbl&gt;\n 1 D PUB INFLACIÓN   OBLIGATORI      1.93e13\n 2 ACCIONES COLOMBIA OBLIGATORI      1.64e13\n 3 RV DESARROLLADOS  OBLIGATORI      1.13e13\n 4 D PUB FIJA        OBLIGATORI      9.38e12\n 5 RV EMERGENTE      OBLIGATORI      8.37e12\n 6 FCP               OBLIGATORI      7.67e12\n 7 D PUB FIJA        FONPET2012      6.24e12\n 8 LIQUIDEZ          OBLIGATORI      5.88e12\n 9 BONOS INFLACIÓN   FONPET2012      4.55e12\n10 D PUB INFLACIÓN   OBLICONSER      3.61e12\n# ℹ 314 more rows\n\n\nAdicional, se construyó un gráfico de barras que muestra los principales activos y portafolios que generan más VPNLocal (en billones de pesos):"
+  },
+  {
+    "objectID": "Punto_5_vf.html#extra",
+    "href": "Punto_5_vf.html#extra",
+    "title": "Punto 5 - Programación en R",
+    "section": "Extra",
+    "text": "Extra\nAdicional, se pueden observar en el siguiente gráfico los principales activos y portafolios que generan más VPNOrigen (en billones de pesos).\n\ndatatot2 &lt;- data |&gt; \n  select(Portafolio, ASSETCLASS, VPNOrigen) |&gt; \n  na.omit() |&gt; \n  group_by(ASSETCLASS, Portafolio) |&gt; \n  summarise(Sum_VPNOrigen = sum(VPNOrigen)) |&gt; \n  arrange(desc(Sum_VPNOrigen))\n\ndatatot2\n\n# A tibble: 324 × 3\n# Groups:   ASSETCLASS [14]\n   ASSETCLASS        Portafolio Sum_VPNOrigen\n   &lt;chr&gt;             &lt;chr&gt;              &lt;dbl&gt;\n 1 ACCIONES COLOMBIA OBLIGATORI       1.63e13\n 2 D PUB FIJA        OBLIGATORI       9.38e12\n 3 D PUB FIJA        FONPET2012       6.24e12\n 4 BONOS INFLACIÓN   FONPET2012       4.50e12\n 5 LIQUIDEZ          OBLIGATORI       3.39e12\n 6 BONOS INFLACIÓN   OBLIGATORI       2.68e12\n 7 BONOS FIJOS       FONPET2012       2.16e12\n 8 D PUB FIJA        OBLICONSER       1.60e12\n 9 BONOS FIJOS       OBLIGATORI       1.51e12\n10 RV DESARROLLADOS  OBLIGATORI       1.30e12\n# ℹ 314 more rows"
+  },
+  {
+    "objectID": "Punto_5_vf.html#punto-5",
+    "href": "Punto_5_vf.html#punto-5",
+    "title": "Punto 5 - Programación en R",
+    "section": "Punto 5",
+    "text": "Punto 5\nBase de datos filtrada para el portafolio OBLIGATORI:\n\ndata2 &lt;- data |&gt; \n  filter(Portafolio == \"OBLIGATORI\")\n\ndata2\n\n# A tibble: 1,277 × 9\n   Fecha               Portafolio ASSETCLASS     Numtit Titulo Nominal VPNOrigen\n   &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;\n 1 2019-02-28 00:00:00 OBLIGATORI D PUB INFLACI…  91123 TUVT1… 1   e 8   1.05e 8\n 2 2019-02-28 00:00:00 OBLIGATORI D PUB FIJA      91135 TFIT1… 8.05e10   9.23e10\n 3 2019-02-28 00:00:00 OBLIGATORI FCP             91136 FCP_N… 1.56e 0   1.69e 4\n 4 2019-02-28 00:00:00 OBLIGATORI BONOS FIJOS     91138 CDTFI… 1.02e11   1.04e11\n 5 2019-02-28 00:00:00 OBLIGATORI D PUB FIJA      91139 TFIT0… 5   e 9   5.06e 9\n 6 2019-02-28 00:00:00 OBLIGATORI FCP             91140 FONDC… 8.86e 4   8.86e 5\n 7 2019-02-28 00:00:00 OBLIGATORI FCP             91141 FONDC… 1.86e 6   1.06e 7\n 8 2019-02-28 00:00:00 OBLIGATORI D PUB FIJA      91142 TFIT0… 2.5 e10   2.53e10\n 9 2019-02-28 00:00:00 OBLIGATORI D PUB FIJA      91143 TFIT0… 2.27e10   2.30e10\n10 2019-02-28 00:00:00 OBLIGATORI D PUB FIJA      91144 TFIT1… 2.28e10   2.30e10\n# ℹ 1,267 more rows\n# ℹ 2 more variables: VPNLocal &lt;dbl&gt;, nommiles &lt;dbl&gt;"
+  },
+  {
+    "objectID": "Punto_5_vf.html#estadísticas-descriptivas",
+    "href": "Punto_5_vf.html#estadísticas-descriptivas",
+    "title": "Punto 5 - Programación en R",
+    "section": "Estadísticas descriptivas",
+    "text": "Estadísticas descriptivas\nA continuación, se presentan algunas de las principales estadísticas descriptivas de la base de datos:\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n¿Cuáles son las clases de activos (ASSETCLASS) con la mayor diversidad de Portafolios?\n\ndf_AC &lt;- data |&gt; \n  group_by(ASSETCLASS) |&gt; \n  summarise(Port_distinct = n_distinct(Portafolio)) |&gt; \n  arrange(desc(Port_distinct))\n\ndf_AC\n\n# A tibble: 14 × 2\n   ASSETCLASS              Port_distinct\n   &lt;chr&gt;                           &lt;int&gt;\n 1 LIQUIDEZ                           71\n 2 BONOS FIJOS                        35\n 3 BONOS INFLACIÓN                    35\n 4 D PUB INFLACIÓN                    27\n 5 ACCIONES COLOMBIA                  26\n 6 D PUB FIJA                         24\n 7 BONOS TASA INTERÉS                 23\n 8 REAL ESTATE                        21\n 9 RV DESARROLLADOS                   16\n10 SOBERANOS EMERGENTES               13\n11 RV EMERGENTE                       10\n12 CORPORATIVOS EXTERIOR               9\n13 SOBERANOS DESARROLLADOS             8\n14 FCP                                 6\n\n\n\n\n\n\n\n\n\n\n\n¿Cuál es la relación que existe entre el valor del VPN Origen y el valor del VPN Local?"
+  }
+]
