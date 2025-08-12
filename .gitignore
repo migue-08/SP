@@ -52,3 +52,6 @@ po/*~
 rsconnect/
 
 /.quarto/
+
+# Jupyter Notebook
+.ipynb_checkpoints
